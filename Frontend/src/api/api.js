@@ -1,7 +1,13 @@
 import axios from 'axios';
 
-// All requests go to /api which is proxied to http://localhost:5001 via vite.config.js
-const api = axios.create({ baseURL: '/api' });
+// Dynamically select baseURL: local proxy in development, absolute backend URL in production
+const isLocal = typeof window !== 'undefined' && 
+  (window.location.hostname === 'localhost' || 
+   window.location.hostname === '127.0.0.1' || 
+   window.location.hostname.startsWith('192.168.'));
+const baseURL = isLocal ? '/api' : 'https://railway-management-system-aaim.onrender.com/api';
+
+const api = axios.create({ baseURL });
 
 // Attach JWT token to every request automatically
 api.interceptors.request.use((config) => {

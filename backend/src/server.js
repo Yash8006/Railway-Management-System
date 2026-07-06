@@ -19,9 +19,22 @@ connectDB();
 
 const app = express();
 
-// Middleware — Allow the Vite frontend (port 5173) and common local origins
+// Middleware — Allow local hosts, main production app, and dynamic onrender subdomains
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  'http://localhost:3000',
+  'https://railway-management-system-1-9fe5.onrender.com'
+];
+
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://127.0.0.1:5173', 'http://localhost:3000'],
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true); // Allow server-to-server or Postman
+    if (allowedOrigins.indexOf(origin) !== -1 || origin.endsWith('.onrender.com')) {
+      return callback(null, true);
+    }
+    return callback(new Error('CORS block: Origin not allowed by RMS policy.'), false);
+  },
   credentials: true,
 }));
 app.use(express.json()); // Body parser
