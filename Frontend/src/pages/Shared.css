@@ -1,0 +1,28 @@
+/* Shared component CSS for notifications and misc */
+
+/* Notification Card */
+.notification-card {
+  transition: all var(--transition-base);
+}
+
+.notification-card.unread {
+  border-color: rgba(59, 130, 246, 0.3);
+  background: rgba(59, 130, 246, 0.04);
+}
+
+.notification-card.unread:hover {
+  border-color: var(--clr-primary);
+  background: rgba(59, 130, 246, 0.08);
+}
+
+.notif-icon {
+  font-size: 1.5rem;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background: var(--clr-surface-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}

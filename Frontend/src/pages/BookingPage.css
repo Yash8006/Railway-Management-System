@@ -1,0 +1,137 @@
+/* Booking Page */
+
+.booking-layout {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: var(--sp-xl);
+  align-items: start;
+}
+
+.booking-main { display: flex; flex-direction: column; }
+
+.booking-sidebar {
+  position: sticky;
+  top: calc(var(--navbar-h) + var(--sp-md));
+}
+
+/* Passenger Card */
+.passengers-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-md);
+}
+
+.passenger-card {
+  background: var(--clr-bg-secondary);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-md);
+  padding: var(--sp-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-md);
+}
+
+.passenger-card-header {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-sm);
+  flex-wrap: wrap;
+}
+
+.passenger-num {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--clr-primary);
+  flex: 1;
+}
+
+.import-select-wrap select {
+  height: 32px;
+  border-radius: var(--radius-sm);
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-sm);
+  font-size: 0.8125rem;
+  color: var(--clr-text-muted);
+  cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+  accent-color: var(--clr-primary);
+  width: 16px;
+  height: 16px;
+}
+
+/* Payment Options */
+.payment-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-sm);
+}
+
+.payment-option {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-md);
+  padding: var(--sp-md);
+  border: 2px solid var(--clr-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.payment-option:hover {
+  border-color: var(--clr-border-hover);
+  background: var(--clr-surface-2);
+}
+
+.payment-option.selected {
+  border-color: var(--clr-primary);
+  background: rgba(59, 130, 246, 0.06);
+}
+
+.payment-option input[type="radio"] { display: none; }
+
+.payment-icon { font-size: 1.25rem; flex-shrink: 0; }
+.payment-label { font-size: 0.9375rem; font-weight: 600; }
+.payment-desc { font-size: 0.75rem; color: var(--clr-text-muted); margin-top: 1px; }
+
+/* Fare Summary */
+.fare-summary { }
+
+.fare-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-sm);
+}
+
+.fare-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+  color: var(--clr-text-muted);
+}
+
+.fare-row strong { color: var(--clr-text); }
+
+.fare-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--clr-text);
+}
+
+.fare-total strong { font-size: 1.375rem; }
+
+.occupancy-bar { margin-top: var(--sp-sm); }
+
+@media (max-width: 900px) {
+  .booking-layout { grid-template-columns: 1fr; }
+  .booking-sidebar { position: static; }
+}

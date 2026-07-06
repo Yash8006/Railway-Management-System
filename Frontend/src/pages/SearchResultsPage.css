@@ -1,0 +1,240 @@
+/* Search Results Page */
+
+.results-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--sp-xl);
+  flex-wrap: wrap;
+  gap: var(--sp-md);
+}
+
+.results-layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: var(--sp-lg);
+  align-items: start;
+}
+
+.results-sidebar {
+  position: sticky;
+  top: calc(var(--navbar-h) + var(--sp-md));
+}
+
+.results-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-md);
+}
+
+/* Train Card */
+.train-card {
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: all var(--transition-base);
+}
+
+.train-card:hover {
+  border-color: var(--clr-border-hover);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.train-card-main {
+  display: grid;
+  grid-template-columns: 1.5fr 2fr 1fr;
+  gap: var(--sp-xl);
+  padding: var(--sp-lg);
+  align-items: center;
+}
+
+/* Train Info */
+.train-info { border-right: 1px solid var(--clr-border); padding-right: var(--sp-lg); }
+
+.train-number {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--clr-primary);
+  margin-bottom: 2px;
+}
+
+.train-name {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  margin-bottom: var(--sp-sm);
+}
+
+.train-meta {
+  display: flex;
+  gap: var(--sp-xs);
+  flex-wrap: wrap;
+}
+
+/* Journey Timeline */
+.train-journey {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-md);
+}
+
+.journey-point {
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.journey-time {
+  font-size: 1.25rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  line-height: 1;
+  margin-bottom: 2px;
+}
+
+.journey-station {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--clr-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.journey-line {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-xs);
+}
+
+.journey-duration {
+  font-size: 0.75rem;
+  color: var(--clr-text-muted);
+  font-weight: 500;
+}
+
+.journey-track {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: var(--sp-xs);
+}
+
+.track-line {
+  flex: 1;
+  height: 2px;
+  background: linear-gradient(90deg, var(--clr-border), var(--clr-primary), var(--clr-border));
+  border-radius: 1px;
+}
+
+.track-train { font-size: 1rem; }
+
+/* Booking Column */
+.train-booking {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--sp-sm);
+  padding-left: var(--sp-lg);
+  border-left: 1px solid var(--clr-border);
+}
+
+.train-fare { text-align: right; }
+
+.fare-amount {
+  font-size: 1.375rem;
+  font-weight: 800;
+  color: var(--clr-text);
+}
+
+.fare-tatkal {
+  font-size: 0.75rem;
+  color: var(--clr-orange);
+  font-weight: 600;
+}
+
+.fare-label {
+  font-size: 0.75rem;
+  color: var(--clr-text-faint);
+  margin-top: 2px;
+}
+
+.avail-row {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Expand stops */
+.train-expand {
+  border-top: 1px solid var(--clr-border);
+  background: var(--clr-bg-secondary);
+}
+
+.expand-btn {
+  width: 100%;
+  padding: 0.5rem var(--sp-lg);
+  background: none;
+  border: none;
+  color: var(--clr-text-muted);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--font-base);
+  transition: color var(--transition-fast);
+}
+
+.expand-btn:hover { color: var(--clr-primary); }
+
+.stops-list {
+  padding: var(--sp-sm) var(--sp-lg) var(--sp-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-sm);
+  animation: slideDown var(--transition-base);
+}
+
+.stop-item {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-md);
+}
+
+.stop-order {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--clr-surface-3);
+  border: 1px solid var(--clr-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  color: var(--clr-text-muted);
+}
+
+.stop-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.stop-times {
+  display: flex;
+  gap: var(--sp-md);
+  font-size: 0.75rem;
+  color: var(--clr-text-faint);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .results-layout { grid-template-columns: 1fr; }
+  .results-sidebar { position: static; }
+  .train-card-main { grid-template-columns: 1fr; gap: var(--sp-md); }
+  .train-info { border-right: none; padding-right: 0; border-bottom: 1px solid var(--clr-border); padding-bottom: var(--sp-md); }
+  .train-booking { align-items: flex-start; padding-left: 0; border-left: none; border-top: 1px solid var(--clr-border); padding-top: var(--sp-md); flex-direction: row; justify-content: space-between; align-items: center; }
+}

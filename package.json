@@ -1,0 +1,11 @@
+{
+  "name": "railway-management-system",
+  "version": "1.0.0",
+  "description": "Root workspace configuration for Railway Management System",
+  "scripts": {
+    "dev:backend": "npm --prefix backend run dev",
+    "dev:frontend": "npm --prefix Frontend run dev",
+    "dev": "npm --prefix backend run dev",
+    "start": "npm --prefix backend start"
+  }
+}

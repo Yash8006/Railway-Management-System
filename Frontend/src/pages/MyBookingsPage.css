@@ -1,0 +1,137 @@
+/* My Bookings Page */
+
+.bookings-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-md);
+}
+
+.booking-card {
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: all var(--transition-base);
+}
+
+.booking-card:hover {
+  border-color: var(--clr-border-hover);
+  box-shadow: var(--shadow-md);
+}
+
+.booking-card.confirmed { border-left: 3px solid var(--clr-green); }
+.booking-card.rac        { border-left: 3px solid var(--clr-amber); }
+.booking-card.waitlisted { border-left: 3px solid var(--clr-orange); }
+.booking-card.cancelled  { border-left: 3px solid var(--clr-red); opacity: 0.75; }
+
+.booking-card-header {
+  padding: var(--sp-md) var(--sp-lg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--sp-sm);
+  background: var(--clr-bg-secondary);
+  border-bottom: 1px solid var(--clr-border);
+}
+
+.booking-pnr-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-md);
+}
+
+.booking-pnr {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--clr-primary);
+}
+
+.booking-train {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-sm);
+}
+
+.train-num-sm {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--clr-text-muted);
+  background: var(--clr-surface-2);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+}
+
+.train-name-sm {
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+/* Journey info row */
+.booking-journey {
+  padding: var(--sp-md) var(--sp-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-lg);
+  flex-wrap: wrap;
+}
+
+.bj-point { display: flex; flex-direction: column; align-items: center; }
+.bj-station { font-size: 1.125rem; font-weight: 800; font-family: var(--font-mono); }
+.bj-label { font-size: 0.6875rem; color: var(--clr-text-faint); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px; }
+.bj-value { font-size: 0.9rem; font-weight: 600; color: var(--clr-text-muted); }
+.bj-arrow { font-size: 1.5rem; color: var(--clr-text-faint); }
+.bj-divider { width: 1px; height: 32px; background: var(--clr-border); }
+.bj-info { display: flex; flex-direction: column; }
+
+/* Passenger chips */
+.booking-passengers {
+  padding: var(--sp-sm) var(--sp-lg);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-sm);
+  border-top: 1px solid var(--clr-border);
+  background: var(--clr-bg-secondary);
+}
+
+.booking-passenger-chip {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-xs);
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-full);
+  padding: 0.2rem 0.65rem;
+  font-size: 0.8125rem;
+}
+
+/* Actions */
+.booking-actions {
+  padding: var(--sp-md) var(--sp-lg);
+  display: flex;
+  gap: var(--sp-sm);
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+/* Refund preview modal content */
+.refund-preview {
+  background: var(--clr-bg-secondary);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-md);
+  padding: var(--sp-md);
+}
+
+.refund-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  color: var(--clr-text-muted);
+  padding: 4px 0;
+}
+
+.refund-total {
+  color: var(--clr-text);
+  font-weight: 600;
+}
