@@ -23,6 +23,7 @@ export default function Navbar() {
   const authLinks = user ? [
     { to: '/bookings', label: '🎫 My Bookings' },
     { to: '/notifications', label: '🔔 Alerts' },
+    ...(user.role === 'admin' || user.role === 'station_master' ? [{ to: '/operator', label: '📡 Operator' }] : []),
     ...(user.role === 'admin' ? [{ to: '/admin', label: '⚙️ Admin' }] : []),
   ] : [];
 

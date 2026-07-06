@@ -15,6 +15,7 @@ import WalletPage from './pages/WalletPage';
 import NotificationsPage from './pages/NotificationsPage';
 import TrackingPage from './pages/TrackingPage';
 import AdminPage from './pages/AdminPage';
+import OperatorPage from './pages/OperatorPage';
 
 import './pages/Shared.css';
 
@@ -41,8 +42,11 @@ export default function App() {
                 <Route path="/wallet" element={<ProtectedRoute><WalletPage /></ProtectedRoute>} />
                 <Route path="/notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
 
+                {/* Operator/Station Master console */}
+                <Route path="/operator" element={<ProtectedRoute allowedRoles={['admin', 'station_master']}><OperatorPage /></ProtectedRoute>} />
+
                 {/* Admin-only route */}
-                <Route path="/admin" element={<ProtectedRoute adminOnly><AdminPage /></ProtectedRoute>} />
+                <Route path="/admin" element={<ProtectedRoute allowedRoles={['admin']}><AdminPage /></ProtectedRoute>} />
 
                 {/* Fallback */}
                 <Route path="*" element={<Navigate to="/" replace />} />

@@ -238,3 +238,107 @@
   .train-info { border-right: none; padding-right: 0; border-bottom: 1px solid var(--clr-border); padding-bottom: var(--sp-md); }
   .train-booking { align-items: flex-start; padding-left: 0; border-left: none; border-top: 1px solid var(--clr-border); padding-top: var(--sp-md); flex-direction: row; justify-content: space-between; align-items: center; }
 }
+
+/* Classes grid styling */
+.classes-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-sm);
+  padding-left: var(--sp-lg);
+  border-left: 1px solid var(--clr-border);
+}
+
+.class-booking-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-md);
+  padding: var(--sp-xs) 0;
+  border-bottom: 1px dashed rgba(99, 143, 255, 0.1);
+}
+
+.class-booking-row:last-child {
+  border-bottom: none;
+}
+
+.class-info-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-sm);
+}
+
+.class-fare {
+  font-family: var(--font-base);
+  font-size: 1rem;
+  color: var(--clr-text);
+}
+
+.class-avail-status {
+  display: flex;
+  align-items: center;
+}
+
+/* Connected Journey Card */
+.connected-journey-card {
+  border-left: 3px solid var(--clr-purple) !important;
+}
+
+.connected-journey-header {
+  background: var(--clr-surface-2);
+  border-bottom: 1px solid var(--clr-border);
+  padding: var(--sp-md) var(--sp-lg);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-md);
+  align-items: center;
+  font-size: 0.875rem;
+  color: var(--clr-text-muted);
+}
+
+.connected-journey-header strong {
+  color: var(--clr-text);
+}
+
+.leg-container {
+  padding: var(--sp-md) var(--sp-lg);
+}
+
+.leg-label {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--clr-text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--sp-sm);
+}
+
+.leg-booking-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-md);
+  align-items: center;
+}
+
+.leg-class-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-xs);
+  background: var(--clr-bg-secondary);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-md);
+  padding: var(--sp-xs) var(--sp-sm);
+}
+
+.border-top {
+  border-top: 1px solid var(--clr-border);
+}
+
+@media (max-width: 900px) {
+  .classes-grid {
+    border-left: none;
+    padding-left: 0;
+    border-top: 1px solid var(--clr-border);
+    padding-top: var(--sp-md);
+  }
+}
+

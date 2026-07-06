@@ -27,9 +27,13 @@ export const getWallet = () => api.get('/users/wallet');
 export const depositWallet = (amount) => api.post('/users/wallet/deposit', { amount });
 
 // --- SEARCH ---
-export const searchTrains = (params) => api.get('/search/trains', { params });
-export const searchConnected = (params) => api.get('/search/connected-journeys', { params });
-export const getSeatAvailability = (params) => api.get('/search/seat-availability', { params });
+// What: Axios calls to direct search, indirect/connected search, and seat availability endpoints.
+// Why: Enables client-side querying of train schedules, connecting routes, and real-time seat inventory.
+// Alternatives: GraphQL query, native fetch calls.
+// Why not alternatives: GraphQL requires extra backend infrastructure, and fetch requires manual header configurations for authorization.
+export const searchTrains = (params) => api.get('/search/direct', { params });
+export const searchConnected = (params) => api.get('/search/indirect', { params });
+export const getSeatAvailability = (params) => api.get('/search/availability', { params });
 
 // --- PAYMENT / FARE ---
 export const getFareEstimate = (params) => api.get('/payment/fare', { params });
@@ -43,12 +47,16 @@ export const getRefundPreview = (id) => api.get(`/bookings/${id}/refund-preview`
 export const downloadTicket = (id) => api.get(`/bookings/${id}/download`, { responseType: 'blob' });
 
 // --- TRACKING ---
-export const getTrainStatus = (runId) => api.get(`/tracking/${runId}`);
-export const searchTrainStatus = (params) => api.get('/tracking/search', { params });
+// What: Live status search and update routes.
+// Why: Provides passengers public lookup capabilities and allows authorized operators to push delay status reports.
+// Alternatives: WebSockets for real-time tracking, Server-Sent Events (SSE).
+// Why not alternatives: Polling REST endpoints is highly reliable, easier to build and debug, and lightweight for standard load conditions.
+export const getTrainLiveStatus = (params) => api.get('/tracking/status', { params });
+export const updateLiveStatus = (runId, data) => api.post(`/tracking/update/${runId}`, data);
 
 // --- NOTIFICATIONS ---
 export const getNotifications = () => api.get('/notifications');
-export const markNotificationRead = (id) => api.put(`/notifications/${id}/read`);
+export const markNotificationRead = (id) => api.post(`/notifications/mark-read/${id}`);
 
 // --- ADMIN ---
 export const getStations = () => api.get('/admin/stations');
