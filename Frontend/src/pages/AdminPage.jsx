@@ -5,7 +5,7 @@ import {
   getRoutes, createRoute, deleteRoute,
   getSchedules, createSchedule, instantiateSchedule, deleteSchedule,
   getSalesAnalytics, getOccupancyAnalytics, getDemographicsAnalytics,
-} from '../api/api';
+} from '../api/api.js';
 import { useToast } from '../context/ToastContext';
 import './AdminPage.css';
 

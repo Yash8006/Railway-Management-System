@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getScheduledRuns, updateLiveStatus, getStations } from '../api/api';
+import { getScheduledRuns, updateLiveStatus, getStations } from '../api/api.js';
 import { useToast } from '../context/ToastContext';
 
 // What: Operator/Station Master dashboard.

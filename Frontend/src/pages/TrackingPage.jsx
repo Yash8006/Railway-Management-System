@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { getScheduledRuns } from '../api/api';
+import { getScheduledRuns } from '../api/api.js';
 import { useToast } from '../context/ToastContext';
 
 const STATUS_CONFIG = {

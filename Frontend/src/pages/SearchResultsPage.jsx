@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { searchConnected, searchTrains } from '../api/api';
+import { searchConnected, searchTrains } from '../api/api.js';
 import { useToast } from '../context/ToastContext';
 import './SearchResultsPage.css';
 

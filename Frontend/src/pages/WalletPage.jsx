@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getWallet, depositWallet } from '../api/api';
+import { getWallet, depositWallet } from '../api/api.js';
 import { useToast } from '../context/ToastContext';
 
 export default function WalletPage() {

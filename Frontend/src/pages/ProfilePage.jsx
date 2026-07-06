@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { updateProfile, getCoPassengers, addCoPassenger, updateCoPassenger, deleteCoPassenger } from '../api/api';
+import { updateProfile, getCoPassengers, addCoPassenger, updateCoPassenger, deleteCoPassenger } from '../api/api.js';
 import { useToast } from '../context/ToastContext';
 import { useAuth } from '../context/AuthContext';
 

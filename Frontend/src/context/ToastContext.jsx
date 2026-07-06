@@ -1,3 +1,4 @@
+/* eslint-disable react/only-export-components */
 import { createContext, useContext, useState, useCallback } from 'react';
 
 const ToastContext = createContext(null);

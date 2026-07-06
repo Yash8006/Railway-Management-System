@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getNotifications, markNotificationRead } from '../api/api';
+import { getNotifications, markNotificationRead } from '../api/api.js';
 import { useToast } from '../context/ToastContext';
 
 const CATEGORY_ICONS = {

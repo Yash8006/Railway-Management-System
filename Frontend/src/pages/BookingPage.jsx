@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { createBooking, getFareEstimate, getCoPassengers } from '../api/api';
+import { createBooking, getFareEstimate, getCoPassengers } from '../api/api.js';
 import { useToast } from '../context/ToastContext';
 import { useAuth } from '../context/AuthContext';
 import './BookingPage.css';

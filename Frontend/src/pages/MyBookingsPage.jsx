@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getMyBookings, cancelBooking, getRefundPreview, downloadTicket } from '../api/api';
+import { getMyBookings, cancelBooking, getRefundPreview, downloadTicket } from '../api/api.js';
 import { useToast } from '../context/ToastContext';
 import './MyBookingsPage.css';
 

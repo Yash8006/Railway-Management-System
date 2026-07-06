@@ -1,5 +1,6 @@
+/* eslint-disable react/only-export-components */
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { loginUser, registerUser, getProfile } from '../api/api';
+import { loginUser, registerUser, getProfile } from '../api/api.js';
 
 const AuthContext = createContext(null);
 
