@@ -4,12 +4,10 @@ import dotenv from 'dotenv';
 import connectDB from './config/db.js';
 import userRoutes from './routes/userRoutes.js';
 import bookingRoutes from './routes/bookingRoutes.js';
-import adminRoutes from './routes/adminRoutes.js';
 import searchRoutes from './routes/searchRoutes.js';
 import trackingRoutes from './routes/trackingRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
-import analyticsRoutes from './routes/analyticsRoutes.js';
 
 // Load environment variables
 dotenv.config();
@@ -42,12 +40,10 @@ app.use(express.json()); // Body parser
 // API Routes
 app.use('/api/users', userRoutes);
 app.use('/api/bookings', bookingRoutes);
-app.use('/api/admin', adminRoutes);
 app.use('/api/search', searchRoutes);
 app.use('/api/tracking', trackingRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/api/notifications', notificationRoutes);
-app.use('/api/admin/analytics', analyticsRoutes);
 
 // Basic Health Check Route
 app.get('/health', (req, res) => {

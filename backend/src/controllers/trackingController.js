@@ -3,6 +3,7 @@ import Train from '../models/trainModel.js';
 import ScheduledRun from '../models/scheduledRunModel.js';
 import LiveStatus from '../models/liveStatusModel.js';
 import { dispatchDelayAlerts, dispatchCancellationAlerts } from '../services/notificationService.js';
+import { syncRouteAndSchedules, getSimulatedLiveDetails, RAILRADAR_TRAINS } from '../services/railRadarService.js';
 
 /**
  * Educational Context (AGENTS.md Compliance):
@@ -176,7 +177,18 @@ export const getTrainLiveStatus = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Please provide trainNumber and date' });
     }
 
-    const train = await Train.findOne({ trainNumber }).populate('route');
+    // 0. Sync Scheduled Run from RailRadar API if it exists in preconfigured trains
+    const matchingTrainData = RAILRADAR_TRAINS.find((t) => t.trainNumber === trainNumber);
+    if (matchingTrainData) {
+      const firstStop = matchingTrainData.stops[0].stationCode;
+      const lastStop = matchingTrainData.stops[matchingTrainData.stops.length - 1].stationCode;
+      await syncRouteAndSchedules(firstStop, lastStop, date);
+    }
+
+    const train = await Train.findOne({ trainNumber }).populate({
+      path: 'route',
+      populate: { path: 'stops.station' }
+    });
     if (!train) {
       return res.status(404).json({ success: false, message: `Train number ${trainNumber} not found` });
     }
@@ -211,14 +223,21 @@ export const getTrainLiveStatus = async (req, res) => {
     const sortedStops = [...train.route.stops].sort((a, b) => a.stopOrder - b.stopOrder);
     const stopTimes = calculateStopDateTimes(run.date, sortedStops);
 
+    // Compute dynamic simulation details
+    const simDetails = getSimulatedLiveDetails(train, sortedStops, run.date, liveStatus.delayMinutes);
+    const currentSpeed = simDetails.currentSpeed;
+    const currentCoordinates = simDetails.currentCoordinates;
+    const overallStatus = liveStatus.status === 'not_started' ? simDetails.status : liveStatus.status;
+    const currentStopOrder = liveStatus.currentStopOrder === 1 && liveStatus.status === 'not_started' ? simDetails.currentStopOrder : liveStatus.currentStopOrder;
+
     const formattedStops = [];
     for (const stop of stopTimes) {
       const station = await Station.findById(stop.station);
       
       let stopStatus = 'upcoming';
-      if (stop.stopOrder < liveStatus.currentStopOrder) {
+      if (stop.stopOrder < currentStopOrder) {
         stopStatus = 'crossed';
-      } else if (stop.stopOrder === liveStatus.currentStopOrder) {
+      } else if (stop.stopOrder === currentStopOrder) {
         stopStatus = 'current';
       }
 
@@ -245,6 +264,7 @@ export const getTrainLiveStatus = async (req, res) => {
         stationCode: station.code,
         stationName: station.name,
         city: station.city,
+        coordinates: station.coordinates, // Route geometry coordinates
         stopOrder: stop.stopOrder,
         distanceKm: stop.distanceFromSource,
         status: stopStatus,
@@ -268,14 +288,17 @@ export const getTrainLiveStatus = async (req, res) => {
         trainName: train.trainName,
         trainType: train.trainType,
         date: run.date,
-        overallStatus: liveStatus.status,
+        overallStatus: overallStatus,
         delayMinutes: liveStatus.delayMinutes,
         delayText: liveStatus.delayMinutes === 0 ? 'On Time' : `Late by ${liveStatus.delayMinutes} mins`,
         currentStation: liveStatus.currentStation ? {
           code: liveStatus.currentStation.code,
           name: liveStatus.currentStation.name,
           city: liveStatus.currentStation.city
-        } : null,
+        } : (simDetails.currentStationCode ? { code: simDetails.currentStationCode } : null),
+        currentSpeed: currentSpeed,
+        currentCoordinates: currentCoordinates,
+        etaText: simDetails.etaText,
         emergencyAlerts: liveStatus.emergencyAlerts,
         stops: formattedStops
       }

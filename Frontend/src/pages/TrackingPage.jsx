@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { getScheduledRuns } from '../api/api.js';
+import { getTrainLiveStatus } from '../api/api.js';
 import { useToast } from '../context/ToastContext';
 
 const STATUS_CONFIG = {
   not_started: { label: 'Not Started', color: 'badge-gray', icon: '⏸' },
-  running: { label: 'On Time', color: 'badge-green', icon: '🚂' },
+  running: { label: 'Running', color: 'badge-green', icon: '🚂' },
   reached: { label: 'Arrived', color: 'badge-blue', icon: '🏁' },
   cancelled: { label: 'Cancelled', color: 'badge-red', icon: '❌' },
   diverted: { label: 'Diverted', color: 'badge-amber', icon: '🔀' },
@@ -20,80 +20,102 @@ export default function TrackingPage() {
 
   const handleSearch = async (e) => {
     e.preventDefault();
+    if (!searchNum.trim()) {
+      addToast('Please enter a Train Number', 'warning');
+      return;
+    }
     setLoading(true);
     setSelectedRun(null);
     try {
-      const res = await getScheduledRuns();
-      const data = res.data.data || [];
-      // Filter by train number and date
-      const filtered = data.filter((r) => {
-        const matchTrain = !searchNum || r.train?.trainNumber?.includes(searchNum.toUpperCase());
-        const runDate = new Date(r.date).toISOString().split('T')[0];
-        const matchDate = !searchDate || runDate === searchDate;
-        return matchTrain && matchDate;
-      });
-      setRuns(filtered);
-      if (filtered.length === 0) addToast('No scheduled runs found for the given criteria', 'info');
+      const res = await getTrainLiveStatus({ trainNumber: searchNum.trim(), date: searchDate });
+      if (res.data.success && res.data.data) {
+        const runData = res.data.data;
+        setRuns([runData]);
+        setSelectedRun(runData);
+      } else {
+        setRuns([]);
+        addToast('No running status found for the given criteria', 'info');
+      }
     } catch (err) {
-      addToast(err.response?.data?.message || 'Search failed', 'error');
-    } finally { setLoading(false); }
+      setRuns([]);
+      addToast(err.response?.data?.message || 'Search failed. Please verify train number.', 'error');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="page-content">
       <div className="page-header">
         <h1 className="page-title">📡 Live Train Tracking</h1>
-        <p className="page-subtitle">Track live running status, platform numbers, and delay information</p>
+        <p className="page-subtitle">Track real-time train location, speed, delays, platform numbers, and route coordinates</p>
       </div>
 
-      {/* Search */}
+      {/* Search Form */}
       <div className="card" style={{ marginBottom: 'var(--sp-xl)' }}>
         <form onSubmit={handleSearch}>
           <div className="form-row">
             <div className="form-group">
-              <label className="form-label">🚂 Train Number</label>
-              <input className="form-input" placeholder="e.g. 12301 (leave blank for all)" value={searchNum} onChange={(e) => setSearchNum(e.target.value)} />
+              <label className="form-label">🚂 Train Number *</label>
+              <input 
+                className="form-input" 
+                placeholder="e.g. 12301" 
+                value={searchNum} 
+                onChange={(e) => setSearchNum(e.target.value)} 
+                required 
+              />
             </div>
             <div className="form-group">
-              <label className="form-label">📅 Journey Date</label>
-              <input className="form-input" type="date" value={searchDate} onChange={(e) => setSearchDate(e.target.value)} />
+              <label className="form-label">📅 Journey Date *</label>
+              <input 
+                className="form-input" 
+                type="date" 
+                value={searchDate} 
+                onChange={(e) => setSearchDate(e.target.value)} 
+                required 
+              />
             </div>
           </div>
           <button type="submit" className="btn btn-primary" style={{ marginTop: 'var(--sp-md)' }} disabled={loading}>
-            {loading ? <><span className="spinner" /> Searching...</> : '🔍 Track Trains'}
+            {loading ? <><span className="spinner" /> Tracking...</> : '🔍 Get Live Status'}
           </button>
         </form>
       </div>
 
-      {/* Results */}
+      {/* Results Workspace */}
       {runs.length > 0 && (
-        <div style={{ display: 'grid', gridTemplateColumns: selectedRun ? '300px 1fr' : '1fr', gap: 'var(--sp-lg)' }}>
-          {/* Run List */}
+        <div style={{ display: 'grid', gridTemplateColumns: selectedRun ? '320px 1fr' : '1fr', gap: 'var(--sp-lg)' }}>
+          
+          {/* Run List Sidebar */}
           <div className="flex flex-col gap-sm">
-            {runs.map((run) => {
-              const sc = STATUS_CONFIG[run.liveStatus?.status || 'not_started'] || STATUS_CONFIG.not_started;
+            {runs.map((run, i) => {
+              const sc = STATUS_CONFIG[run.overallStatus || 'not_started'] || STATUS_CONFIG.not_started;
               return (
                 <div
-                  key={run._id}
-                  className={`card tracking-run-card ${selectedRun?._id === run._id ? 'selected' : ''}`}
-                  onClick={() => setSelectedRun(selectedRun?._id === run._id ? null : run)}
-                  style={{ cursor: 'pointer' }}
+                  key={i}
+                  className={`card tracking-run-card ${selectedRun?.scheduledRunId === run.scheduledRunId ? 'selected' : ''}`}
+                  onClick={() => setSelectedRun(selectedRun?.scheduledRunId === run.scheduledRunId ? null : run)}
+                  style={{ cursor: 'pointer', border: selectedRun?.scheduledRunId === run.scheduledRunId ? '2px solid var(--clr-primary)' : '1px solid var(--clr-border)' }}
                 >
                   <div className="flex items-center justify-between">
                     <div>
-                      <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.85rem', color: 'var(--clr-primary)' }}>
-                        {run.train?.trainNumber}
+                      <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.85rem', color: 'var(--clr-primary)', fontWeight: 600 }}>
+                        {run.trainNumber}
                       </div>
-                      <div style={{ fontWeight: 700 }}>{run.train?.trainName}</div>
+                      <div style={{ fontWeight: 700, fontSize: '1rem', marginTop: '2px' }}>{run.trainName}</div>
                     </div>
                     <span className={`badge ${sc.color}`}>{sc.icon} {sc.label}</span>
                   </div>
-                  <div className="text-sm text-muted" style={{ marginTop: 'var(--sp-sm)' }}>
-                    📅 {new Date(run.date).toDateString()} &nbsp;·&nbsp; {run.seats?.length || 0} seats
+                  <div className="text-sm text-muted" style={{ marginTop: 'var(--sp-sm)', display: 'flex', justifyContent: 'between', alignItems: 'center' }}>
+                    <span>📅 {new Date(run.date).toDateString()}</span>
                   </div>
-                  {run.liveStatus?.delayMinutes > 0 && (
+                  {run.delayMinutes > 0 ? (
                     <div className="badge badge-red" style={{ marginTop: 'var(--sp-xs)', display: 'inline-flex' }}>
-                      ⏰ Late by {run.liveStatus.delayMinutes} mins
+                      ⏰ Late by {run.delayMinutes} mins
+                    </div>
+                  ) : (
+                    <div className="badge badge-green" style={{ marginTop: 'var(--sp-xs)', display: 'inline-flex' }}>
+                      ✓ On Time
                     </div>
                   )}
                 </div>
@@ -101,67 +123,179 @@ export default function TrackingPage() {
             })}
           </div>
 
-          {/* Detail Panel */}
+          {/* Detailed Live Tracking Dashboard */}
           {selectedRun && (
-            <div className="card">
-              <div className="flex items-center justify-between" style={{ marginBottom: 'var(--sp-lg)' }}>
+            <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-lg)' }}>
+              
+              {/* Header Info */}
+              <div className="flex items-center justify-between" style={{ borderBottom: '1px solid var(--clr-border)', paddingBottom: 'var(--sp-md)' }}>
                 <div>
-                  <div style={{ fontFamily: 'var(--font-mono)', color: 'var(--clr-primary)' }}>{selectedRun.train?.trainNumber}</div>
-                  <h2 style={{ fontSize: '1.25rem', fontWeight: 700 }}>{selectedRun.train?.trainName}</h2>
+                  <div style={{ fontFamily: 'var(--font-mono)', color: 'var(--clr-primary)', fontWeight: 600 }}>
+                    {selectedRun.trainNumber} · {selectedRun.trainType}
+                  </div>
+                  <h2 style={{ fontSize: '1.5rem', fontWeight: 800 }}>{selectedRun.trainName}</h2>
                 </div>
-                <button className="modal-close" onClick={() => setSelectedRun(null)}>✕</button>
+                <button className="btn btn-ghost" onClick={() => setSelectedRun(null)} style={{ padding: '4px 10px' }}>✕ Close</button>
               </div>
 
-              {selectedRun.liveStatus ? (
-                <>
-                  <div className="grid-3" style={{ gap: 'var(--sp-md)', marginBottom: 'var(--sp-lg)' }}>
-                    <div className="stat-card">
-                      <div className="stat-label">Status</div>
-                      <div className="stat-value" style={{ fontSize: '1.25rem' }}>{STATUS_CONFIG[selectedRun.liveStatus.status]?.label}</div>
-                    </div>
-                    <div className="stat-card">
-                      <div className="stat-label">Delay</div>
-                      <div className="stat-value" style={{ fontSize: '1.25rem', color: selectedRun.liveStatus.delayMinutes > 0 ? 'var(--clr-red)' : 'var(--clr-green)' }}>
-                        {selectedRun.liveStatus.delayMinutes > 0 ? `+${selectedRun.liveStatus.delayMinutes} min` : 'On Time'}
-                      </div>
-                    </div>
-                    <div className="stat-card">
-                      <div className="stat-label">Current Stop</div>
-                      <div className="stat-value" style={{ fontSize: '1.25rem' }}>{selectedRun.liveStatus.currentStopOrder || '—'}</div>
-                    </div>
-                  </div>
+              {/* Real-time Telemetry Panel */}
+              <div className="grid-3" style={{ gap: 'var(--sp-md)' }}>
+                <div className="stat-card" style={{ background: 'var(--clr-surface-2)', padding: 'var(--sp-md)', borderRadius: 'var(--radius-md)', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <span className="stat-label" style={{ fontSize: '0.8rem', color: 'var(--clr-text-muted)', textTransform: 'uppercase' }}>⚡ Current Speed</span>
+                  <span className="stat-value" style={{ fontSize: '1.5rem', fontWeight: 800, color: selectedRun.currentSpeed > 0 ? 'var(--clr-green)' : 'var(--clr-text-muted)' }}>
+                    🏎️ {selectedRun.currentSpeed} km/h
+                  </span>
+                </div>
 
-                  {selectedRun.liveStatus.emergencyAlerts?.length > 0 && (
-                    <div className="warning-box" style={{ marginBottom: 'var(--sp-md)' }}>
-                      🚨 {selectedRun.liveStatus.emergencyAlerts.join(' · ')}
-                    </div>
-                  )}
+                <div className="stat-card" style={{ background: 'var(--clr-surface-2)', padding: 'var(--sp-md)', borderRadius: 'var(--radius-md)', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <span className="stat-label" style={{ fontSize: '0.8rem', color: 'var(--clr-text-muted)', textTransform: 'uppercase' }}>📍 Live GPS Position</span>
+                  <span className="stat-value" style={{ fontSize: '1.1rem', fontWeight: 700, fontFamily: 'var(--font-mono)', wordBreak: 'break-all' }}>
+                    🧭 {selectedRun.currentCoordinates ? `${selectedRun.currentCoordinates.latitude.toFixed(4)}° N, ${selectedRun.currentCoordinates.longitude.toFixed(4)}° E` : 'Not Available'}
+                  </span>
+                </div>
 
-                  {selectedRun.liveStatus.platformNumbers?.length > 0 && (
-                    <div style={{ marginBottom: 'var(--sp-md)' }}>
-                      <h3 className="section-title" style={{ marginBottom: 'var(--sp-sm)' }}>Platform Numbers</h3>
-                      <div className="flex gap-sm flex-wrap">
-                        {selectedRun.liveStatus.platformNumbers.map((p, i) => (
-                          <span key={i} className="badge badge-blue">Pf. {p.platform}</span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </>
-              ) : (
-                <div className="info-box">
-                  ℹ️ Live status has not been updated yet for this run. Station master updates are pending.
+                <div className="stat-card" style={{ background: 'var(--clr-surface-2)', padding: 'var(--sp-md)', borderRadius: 'var(--radius-md)', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <span className="stat-label" style={{ fontSize: '0.8rem', color: 'var(--clr-text-muted)', textTransform: 'uppercase' }}>⏱️ Status & Delay</span>
+                  <span className="stat-value" style={{ fontSize: '1.25rem', fontWeight: 800, color: selectedRun.delayMinutes > 0 ? 'var(--clr-red)' : 'var(--clr-green)' }}>
+                    {selectedRun.delayText}
+                  </span>
+                </div>
+              </div>
+
+              {/* Status Alert Box */}
+              {selectedRun.etaText && (
+                <div style={{ background: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(59, 130, 246, 0.2)', padding: 'var(--sp-md)', borderRadius: 'var(--radius-md)', color: 'var(--clr-text)' }}>
+                  📢 <strong>Status Broadcast:</strong> {selectedRun.etaText}
                 </div>
               )}
 
-              <div style={{ marginTop: 'var(--sp-lg)' }}>
-                <h3 className="section-title" style={{ marginBottom: 'var(--sp-md)' }}>Seat Summary</h3>
-                <div style={{ fontSize: '0.875rem', color: 'var(--clr-text-muted)' }}>
-                  Total seats: <strong>{selectedRun.seats?.length}</strong> &nbsp;·&nbsp;
-                  Booked: <strong>{selectedRun.seats?.filter((s) => s.bookedSegments?.length > 0).length}</strong> &nbsp;·&nbsp;
-                  Available: <strong className="text-green">{selectedRun.seats?.filter((s) => s.bookedSegments?.length === 0).length}</strong>
+              {selectedRun.emergencyAlerts?.length > 0 && (
+                <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', padding: 'var(--sp-md)', borderRadius: 'var(--radius-md)', color: 'var(--clr-red)' }}>
+                  🚨 <strong>Emergency Alert:</strong> {selectedRun.emergencyAlerts.join(' · ')}
+                </div>
+              )}
+
+              {/* Vertical Stops Timeline */}
+              <div style={{ marginTop: 'var(--sp-sm)' }}>
+                <h3 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: 'var(--sp-lg)' }}>🗺️ Route Geometry & Stations Timeline</h3>
+                
+                <div className="stops-timeline" style={{ display: 'flex', flexDirection: 'column', position: 'relative', paddingLeft: '24px' }}>
+                  
+                  {/* Timeline Vertical bar */}
+                  <div style={{
+                    position: 'absolute',
+                    left: '7px',
+                    top: '12px',
+                    bottom: '12px',
+                    width: '3px',
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)'
+                  }} />
+
+                  {selectedRun.stops?.map((stop, index) => {
+                    const isCrossed = stop.status === 'crossed';
+                    const isCurrent = stop.status === 'current';
+                    
+                    let nodeColor = 'rgba(255, 255, 255, 0.2)';
+                    let nodeSize = '12px';
+                    let nodeLeft = '3px';
+                    let nodeShadow = 'none';
+
+                    if (isCrossed) {
+                      nodeColor = 'var(--clr-green)';
+                    } else if (isCurrent) {
+                      nodeColor = 'var(--clr-primary)';
+                      nodeSize = '16px';
+                      nodeLeft = '1px';
+                      nodeShadow = '0 0 10px var(--clr-primary)';
+                    }
+
+                    return (
+                      <div 
+                        key={index} 
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'flex-start',
+                          paddingBottom: '24px',
+                          position: 'relative'
+                        }}
+                      >
+                        
+                        {/* Timeline Node dot */}
+                        <div style={{
+                          position: 'absolute',
+                          left: `-24px`,
+                          top: '4px',
+                          marginLeft: nodeLeft,
+                          width: nodeSize,
+                          height: nodeSize,
+                          borderRadius: '50%',
+                          backgroundColor: nodeColor,
+                          boxShadow: nodeShadow,
+                          transition: 'all 0.3s ease',
+                          zIndex: 2
+                        }} />
+
+                        {/* Station details */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', flex: 1, paddingRight: 'var(--sp-md)' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-xs)' }}>
+                            <strong style={{ fontSize: '1.05rem', color: isCurrent ? 'var(--clr-primary)' : 'var(--clr-text)' }}>
+                              {stop.stationName}
+                            </strong>
+                            <span style={{ 
+                              fontFamily: 'var(--font-mono)', 
+                              fontSize: '0.8rem', 
+                              background: 'var(--clr-surface-2)', 
+                              padding: '2px 6px', 
+                              borderRadius: '4px',
+                              color: 'var(--clr-text-muted)' 
+                            }}>
+                              {stop.stationCode}
+                            </span>
+                            {isCurrent && <span className="badge badge-green" style={{ fontSize: '0.7rem' }}>📍 Current position</span>}
+                          </div>
+                          
+                          <div style={{ fontSize: '0.8rem', color: 'var(--clr-text-muted)' }}>
+                            City: {stop.city} &nbsp;·&nbsp; Distance: {stop.distanceKm} km
+                          </div>
+
+                          <div style={{ 
+                            fontFamily: 'var(--font-mono)', 
+                            fontSize: '0.75rem', 
+                            color: 'var(--clr-text-faint)', 
+                            marginTop: '2px'
+                          }}>
+                            🧭 GPS Coordinates: {stop.coordinates.latitude.toFixed(4)}° N, {stop.coordinates.longitude.toFixed(4)}° E
+                          </div>
+                        </div>
+
+                        {/* Schedule Times and Platform */}
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', minWidth: '120px', textAlign: 'right' }}>
+                          <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--clr-text-muted)' }}>
+                            Sched: {stop.scheduled.arrival || stop.scheduled.departure}
+                          </span>
+                          <span style={{ fontSize: '0.85rem', fontWeight: 700, color: selectedRun.delayMinutes > 0 ? 'var(--clr-red)' : 'var(--clr-green)' }}>
+                            Est: {stop.estimated.arrival || stop.estimated.departure}
+                          </span>
+                          <span style={{ 
+                            fontSize: '0.75rem', 
+                            background: 'rgba(59, 130, 246, 0.1)', 
+                            color: 'var(--clr-primary)', 
+                            padding: '2px 6px', 
+                            borderRadius: '4px', 
+                            marginTop: '4px', 
+                            fontWeight: 600 
+                          }}>
+                            Platform {stop.platform}
+                          </span>
+                        </div>
+
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
+
             </div>
           )}
         </div>
@@ -171,7 +305,7 @@ export default function TrackingPage() {
         <div className="empty-state">
           <span className="empty-state-icon">📡</span>
           <h3>Search for train status</h3>
-          <p>Enter a train number and date above to track live running status.</p>
+          <p>Enter a train number (e.g. 12301) and journey date to retrieve live coordinates and ETAs.</p>
         </div>
       )}
     </div>

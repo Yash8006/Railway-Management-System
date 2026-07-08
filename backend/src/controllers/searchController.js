@@ -1,6 +1,7 @@
 import Station from '../models/stationModel.js';
 import Train from '../models/trainModel.js';
 import ScheduledRun from '../models/scheduledRunModel.js';
+import { syncRouteAndSchedules } from '../services/railRadarService.js';
 
 /**
  * Educational Context (AGENTS.md Compliance):
@@ -129,6 +130,9 @@ export const searchDirectTrains = async (req, res) => {
     if (!from || !to || !date) {
       return res.status(400).json({ success: false, message: 'Please provide from, to, and date' });
     }
+
+    // 0. Sync Route and Schedules from RailRadar API if needed
+    await syncRouteAndSchedules(from, to, date);
 
     // 1. Resolve Station Codes
     const sourceStation = await Station.findOne({ code: from.toUpperCase() });
@@ -264,6 +268,9 @@ export const searchIndirectTrains = async (req, res) => {
     if (!from || !to || !date) {
       return res.status(400).json({ success: false, message: 'Please provide from, to, and date' });
     }
+
+    // 0. Sync Route and Schedules from RailRadar API if needed
+    await syncRouteAndSchedules(from, to, date);
 
     const sourceStation = await Station.findOne({ code: from.toUpperCase() });
     const destStation = await Station.findOne({ code: to.toUpperCase() });
